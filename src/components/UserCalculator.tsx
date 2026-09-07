@@ -67,6 +67,8 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
   const [rmvCharge, setRmvCharge] = useState<number>(8500);
   const [period, setPeriod] = useState<number>(settings.defaultFacilityPeriod || 36);
   const [interestRate, setInterestRate] = useState<number>(settings.defaultInterestRate || 14.5);
+  const [facilityDate, setFacilityDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [showCalculation, setShowCalculation] = useState(false);
   const [copiedNotification, setCopiedNotification] = useState<string | null>(null);
   const skipInitialBikeLoad = useRef(false);
 
@@ -83,6 +85,8 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
     setRmvCharge(0);
     setPeriod(0);
     setInterestRate(0);
+    setFacilityDate(new Date().toISOString().split('T')[0]);
+    setShowCalculation(false);
     setCopiedNotification(null);
   }, [reloadToken]);
 
@@ -168,7 +172,7 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
     facilityAmount,
     facilityPeriod: validPeriod,
     facilityInterestRate: annualRate,
-    releaseDate: new Date().toISOString().split('T')[0],
+    releaseDate: facilityDate,
     calculationMethod: 'flat',
     includeChargesInLoan: true,
   };
@@ -434,16 +438,6 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">Facility Amount</label>
-                <input
-                  type="text"
-                  readOnly
-                  value={`LKR ${formatNumber(facilityAmount)}`}
-                  className="w-full border border-slate-200 rounded-lg p-2 bg-slate-100 text-xs font-bold text-slate-800 outline-none"
-                />
-              </div>
-
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 mb-1">{t.period}</label>
@@ -468,11 +462,41 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
                 </div>
               </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Total Interest</label>
+                  <input
+                    type="text"
+                    readOnly
+                    value={`LKR ${formatNumber(totalInterest)}`}
+                    className="w-full border border-slate-200 rounded-lg p-2 bg-slate-100 text-xs font-bold text-slate-800 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Facility Amount</label>
+                  <input
+                    type="text"
+                    readOnly
+                    value={`LKR ${formatNumber(facilityAmount)}`}
+                    className="w-full border border-slate-200 rounded-lg p-2 bg-slate-100 text-xs font-bold text-slate-800 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Expected Facility Date</label>
+                  <input
+                    type="date"
+                    value={facilityDate}
+                    onChange={(e) => setFacilityDate(e.target.value)}
+                    className="w-full border border-slate-200 rounded-lg p-2 text-xs font-bold outline-none focus:ring-2 focus:ring-[#1B365D]"
+                  />
+                </div>
+              </div>
+
               {/* USER ACTION BUTTONS */}
               <div className="pt-2 flex flex-col sm:flex-row gap-2">
                 <button
                   type="button"
-                  onClick={() => onSelectTool('schedule')}
+                  onClick={() => setShowCalculation(true)}
                   className="flex-1 bg-[#1B365D] hover:bg-[#122440] text-white py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 shadow transition cursor-pointer"
                 >
                   <Calculator className="w-4 h-4" />
@@ -491,7 +515,7 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
           </div>
 
           {/* 2. FORMULA SUMMARY DISPLAY (14px font target with 0.00 price format) */}
-          <div
+          {showCalculation && <div
             id="summary-card"
             ref={summaryCardRef}
             className="bg-[#1B365D] text-white p-6 rounded-xl shadow-md space-y-4"
@@ -560,12 +584,12 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
                 </span>
               </div>
             </div>
-          </div>
+          </div>}
         </>
       )}
 
       {/* 2. AMORTIZATION SCHEDULE TOOL (0.00 Format) */}
-      {activeTool === 'schedule' && (
+      {(activeTool === 'schedule' || (activeTool === 'calculator' && showCalculation)) && (
         <div className="space-y-5">
           <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-wrap justify-between items-center gap-3">
             <div>
