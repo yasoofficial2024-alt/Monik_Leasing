@@ -91,7 +91,7 @@ export default function App() {
     setIsSyncing(true);
     try {
       const res = await syncFromSupabase(settings);
-      if (res.success && res.data && res.data.length > 0) {
+      if (res.success && res.data) {
         setBikes(res.data);
         saveStoredBikes(res.data);
       }
