@@ -57,7 +57,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <p className="text-sm sm:text-base text-slate-200 font-black tracking-wider uppercase mt-1">LEASING &amp; HIRE PURCHASE</p>
               </div>
             </div>
-            <div className="date-time-box text-left lg:text-right text-xs sm:text-sm font-bold text-white whitespace-nowrap">
+            <div className="date-time-box text-left lg:text-right text-xs sm:text-sm font-bold whitespace-nowrap">
               <div>{currentDateTime.toLocaleDateString('en-GB')}</div>
               <div>{currentDateTime.toLocaleTimeString('en-GB')}</div>
             </div>
