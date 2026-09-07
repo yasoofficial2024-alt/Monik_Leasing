@@ -48,6 +48,11 @@ export const Navbar: React.FC<NavbarProps> = ({
       <header className="bg-[#122440] text-white shadow-lg border-b-4 border-[#E32636]">
         <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+            <div className="date-time-box order-1 text-left text-xs sm:text-sm font-bold whitespace-nowrap">
+              <div className="font-black uppercase tracking-wide">{currentDateTime.toLocaleDateString('en-US', { weekday: 'long' })}</div>
+              <div>{currentDateTime.toLocaleDateString('en-GB')}</div>
+              <div>{currentDateTime.toLocaleTimeString('en-GB')}</div>
+            </div>
             <div className="flex items-center gap-4 min-w-0">
               <img src="/assets/monik-logo.svg" alt="Monik Group of Companies" className="h-20 w-28 sm:h-24 sm:w-32 shrink-0 rounded-xl bg-white object-contain p-2 shadow" />
               <div className="min-w-0">
@@ -56,10 +61,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </h1>
                 <p className="text-sm sm:text-base text-slate-200 font-black tracking-wider uppercase mt-1">LEASING &amp; HIRE PURCHASE</p>
               </div>
-            </div>
-            <div className="date-time-box text-left lg:text-right text-xs sm:text-sm font-bold whitespace-nowrap">
-              <div>{currentDateTime.toLocaleDateString('en-GB')}</div>
-              <div>{currentDateTime.toLocaleTimeString('en-GB')}</div>
             </div>
           </div>
 
