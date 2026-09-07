@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Home, Languages, RefreshCw, RotateCcw } from 'lucide-react';
+import { CloudDownload, Home, Languages, RefreshCw, RotateCcw } from 'lucide-react';
 import { AppSettings } from '../types';
 import { Language, translations } from '../utils/i18n';
 
@@ -69,6 +69,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               <>
                 <button type="button" onClick={() => onSelectTool('calculator')} className="nav-action nav-action-red">Calculate</button>
                 <button type="button" onClick={() => onSelectTool('schedule')} className="nav-action nav-action-white">Amortization Schedule</button>
+                {onManualSync && (
+                  <button type="button" onClick={onManualSync} disabled={isSyncing || !isOnline} className="nav-action nav-action-white disabled:cursor-not-allowed disabled:opacity-60">
+                    <CloudDownload className="w-4 h-4" /> {isSyncing ? 'Syncing...' : 'Download & Sync'}
+                  </button>
+                )}
               </>
             )}
             <div className="ml-auto flex flex-wrap items-center gap-2">
