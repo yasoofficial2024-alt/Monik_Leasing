@@ -122,21 +122,23 @@ export default function App() {
   };
 
   // Factory reset
-  const handleResetDefaults = () => {
+  const handleResetDefaults = async () => {
     const { bikes: resetBikes, settings: resetSettings } = resetToFactoryDefaults();
     setBikes(resetBikes);
     setSettings(resetSettings);
-    if (isOnline && resetSettings.supabaseUrl && resetSettings.supabaseAnonKey) {
-      syncToSupabase(resetBikes, resetSettings).catch(console.warn);
+    if (isOnline && settings.supabaseUrl && settings.supabaseAnonKey) {
+      const result = await syncToSupabase(resetBikes, settings);
+      if (!result.success) throw new Error(result.error || 'Factory reset database sync failed.');
     }
   };
 
   // Complete wipe of all saved records
-  const handleWipeDatabase = () => {
+  const handleWipeDatabase = async () => {
     const { bikes: wipedBikes } = wipeAllStoredData();
     setBikes(wipedBikes);
     if (isOnline && settings.supabaseUrl && settings.supabaseAnonKey) {
-      syncToSupabase(wipedBikes, settings).catch(console.warn);
+      const result = await syncToSupabase(wipedBikes, settings);
+      if (!result.success) throw new Error(result.error || 'Database wipe failed.');
     }
   };
 

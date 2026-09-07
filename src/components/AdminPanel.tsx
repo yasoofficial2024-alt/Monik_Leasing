@@ -40,8 +40,8 @@ interface AdminPanelProps {
   language: Language;
   onUpdateBikes: (bikes: BikeModel[]) => void;
   onUpdateSettings: (settings: AppSettings) => void;
-  onResetDefaults: () => void;
-  onWipeDatabase?: () => void;
+  onResetDefaults: () => Promise<void>;
+  onWipeDatabase?: () => Promise<void>;
   isOnline: boolean;
 }
 
@@ -504,29 +504,37 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   // 6. COMPLETE DATABASE RESET & WIPE OPTIONS
-  const handleCompleteResetToFactory = () => {
+  const handleCompleteResetToFactory = async () => {
     if (
       window.confirm(
         '⚠️ COMPLETELY RESET DATABASE?\n\nThis will delete all custom vehicle records and restored data, resetting back to the Monik Group standard factory catalog.\n\nAre you sure?'
       )
     ) {
-      onResetDefaults();
-      showToast('success', 'Database completely reset to factory catalog defaults.');
+      try {
+        await onResetDefaults();
+        showToast('success', 'Database reset to factory catalog defaults.');
+      } catch (error) {
+        showToast('error', error instanceof Error ? error.message : 'Factory reset failed.');
+      }
     }
   };
 
-  const handleWipeAllSavedData = () => {
+  const handleWipeAllSavedData = async () => {
     if (
       window.confirm(
         '🚨 CRITICAL ACTION: WIPE ALL SAVED DATA?\n\nThis will completely erase all 100% of vehicle records in the database (0 vehicles). You can then start fresh or upload a new Excel file.\n\nDo you want to proceed?'
       )
     ) {
-      if (onWipeDatabase) {
-        onWipeDatabase();
-      } else {
-        onUpdateBikes([]);
+      try {
+        if (onWipeDatabase) {
+          await onWipeDatabase();
+        } else {
+          onUpdateBikes([]);
+        }
+        showToast('info', 'All bike details have been deleted from the database.');
+      } catch (error) {
+        showToast('error', error instanceof Error ? error.message : 'Database wipe failed.');
       }
-      showToast('info', 'All database saved data has been wiped (0 records).');
     }
   };
 
