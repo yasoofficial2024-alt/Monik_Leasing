@@ -49,9 +49,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
             <div className="date-time-box order-1 text-left text-xs sm:text-sm font-bold whitespace-nowrap">
-              <div className="font-black uppercase tracking-wide">{currentDateTime.toLocaleDateString('en-US', { weekday: 'long' })}</div>
-              <div>{currentDateTime.toLocaleDateString('en-GB')}</div>
-              <div>{currentDateTime.toLocaleTimeString('en-GB')}</div>
+              {currentDateTime.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase()} | {currentDateTime.toLocaleDateString('en-GB').replaceAll('/', '-')} | {currentDateTime.toLocaleTimeString('en-GB', { hour12: false })}
             </div>
             <div className="flex items-center gap-4 min-w-0">
               <img src="/assets/monik-logo.svg" alt="Monik Group of Companies" className="h-20 w-28 sm:h-24 sm:w-32 shrink-0 rounded-xl bg-white object-contain p-2 shadow" />
