@@ -55,7 +55,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span className="text-[#E32636]">MONIK</span>{' '}
                   <span className="text-[#1B365D]">GROUP OF COMPANIES</span>
                 </h1>
-                <p className="text-sm sm:text-base text-black font-black tracking-wider uppercase mt-1">CHAIRMAN OFFICE</p>
+                <p className="text-sm sm:text-base text-black font-black tracking-wider uppercase mt-1">LEASING &amp; HIREPURCHASE</p>
               </div>
             </div>
             <div className="text-left lg:text-right text-xs sm:text-sm font-bold text-[#1B365D] whitespace-nowrap">

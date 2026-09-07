@@ -101,7 +101,7 @@ export function generateStandaloneHtmlCode(bikes: BikeModel[], settings: AppSett
         </div>
         <div>
           <h1 class="text-xl font-black tracking-wide leading-none" id="hdr-title">MONIK GROUP OF COMPANIES</h1>
-          <p class="text-xs text-rose-300 font-bold tracking-wider uppercase mt-0.5" id="hdr-subtitle">CHAIRMAN OFFICE</p>
+          <p class="text-xs text-rose-300 font-bold tracking-wider uppercase mt-0.5" id="hdr-subtitle">LEASING &amp; HIREPURCHASE</p>
         </div>
       </div>
 
@@ -496,7 +496,7 @@ export function generateStandaloneHtmlCode(bikes: BikeModel[], settings: AppSett
         btnAdminLogin: "Open Admin",
         btnAdminExit: "Close Admin",
         hdrTitle: "MONIK GROUP OF COMPANIES",
-        hdrSub: "CHAIRMAN OFFICE",
+        hdrSub: "LEASING & HIREPURCHASE",
         vehDetails: "Vehicle Details",
         brand: "Brand",
         model: "Model",
@@ -542,7 +542,7 @@ export function generateStandaloneHtmlCode(bikes: BikeModel[], settings: AppSett
         btnAdminLogin: "පරිපාලක ඇතුල්වීම",
         btnAdminExit: "පරිපාලකයෙන් පිටවීම",
         hdrTitle: "මොනික් සමාගම් සමූහය",
-        hdrSub: "CHAIRMAN OFFICE",
+        hdrSub: "LEASING & HIREPURCHASE",
         vehDetails: "වාහන විස්තර",
         brand: "වෙළඳ නාමය (Brand)",
         model: "මාදිලිය (Model)",
@@ -588,7 +588,7 @@ export function generateStandaloneHtmlCode(bikes: BikeModel[], settings: AppSett
         btnAdminLogin: "நிர்வாகி உள்நுழைவு",
         btnAdminExit: "நிர்வாகியிலிருந்து வெளியேறு",
         hdrTitle: "மோனிக் குரூப் ஆஃப் கம்பெனிஸ்",
-        hdrSub: "CHAIRMAN OFFICE",
+        hdrSub: "LEASING & HIREPURCHASE",
         vehDetails: "வாகன விவரங்கள்",
         brand: "பிராண்ட்",
         model: "மாதிரி (Model)",
