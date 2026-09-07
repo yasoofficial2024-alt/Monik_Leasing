@@ -91,9 +91,14 @@ export function generateAmortizationSchedule(
         endBalance = Math.max(0, currentBalance - principalComp);
       }
     } else {
-      principalComp = P / n;
-      payment = principalComp;
+      const totalInterestPerPeriod = summary.totalInterest / n;
+      const totalPrincipal = Math.max(0, P - summary.totalInterest);
+      principalComp = totalPrincipal / n;
+      interestComp = totalInterestPerPeriod;
+      payment = principalComp + interestComp;
       if (m === n) {
+        principalComp = Math.max(0, currentBalance - interestComp);
+        payment = principalComp + interestComp;
         endBalance = 0;
       } else {
         endBalance = Math.max(0, currentBalance - principalComp);
