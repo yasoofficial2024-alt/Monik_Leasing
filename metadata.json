@@ -1,0 +1,7 @@
+{
+  "name": "Monik Group of Companies - Hire Purchase Pro",
+  "description": "Vehicle Hire Purchase & AutoFinance calculator with tri-language support, WhatsApp quotation sharing, Excel bulk import, and admin configuration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicle Financing & Installment Calculator (Standalone)</title>
+  <meta name="description" content="Complete offline vehicle financing, installment calculation, and admin inventory management web application.">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- jsPDF & AutoTable CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- NAVIGATION HEADER -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-800 flex items-center justify-center text-white shadow-md shadow-indigo-600/20">
+          <i data-lucide="bike" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-lg text-slate-900 tracking-tight" id="header-company-name">Apex Motor Financing</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">STANDALONE SUITE</span>
+          </div>
+          <p class="text-xs text-slate-500 hidden sm:block">Vehicle Financing & Installment Calculator</p>
+        </div>
+      </div>
+
+      <!-- VIEW MODE TOGGLE -->
+      <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+        <button id="btn-mode-user" onclick="switchMode('user')" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-indigo-700 shadow-sm transition-all">
+          <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+          <span>User View</span>
+        </button>
+        <button id="btn-mode-admin" onclick="switchMode('admin')" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+          <span>Admin Panel</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+    
+    <!-- USER MODE CONTAINER -->
+    <div id="view-user" class="space-y-6">
+      <!-- 3 TOOLS TABS -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-2 shadow-xs flex flex-wrap items-center justify-between gap-2 no-print">
+        <div class="flex items-center gap-1.5 overflow-x-auto">
+          <button id="btn-tool-1" onclick="switchUserTool('calc')" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
+            <i data-lucide="calculator" class="w-4 h-4"></i>
+            <span>TOOL 01: Installment Calculator</span>
+          </button>
+          <button id="btn-tool-2" onclick="switchUserTool('sched')" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
+            <i data-lucide="calendar" class="w-4 h-4"></i>
+            <span>TOOL 02: Payment Schedule Preview</span>
+          </button>
+          <button id="btn-tool-3" onclick="switchUserTool('rmv')" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
+            <i data-lucide="building" class="w-4 h-4"></i>
+            <span>TOOL 03: RMV Charge Calculator</span>
+          </button>
+        </div>
+        <button onclick="downloadQuotationPDF()" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-200">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span>Download Quotation</span>
+        </button>
+      </div>
+
+      <!-- TOOL 01: CALCULATOR -->
+      <div id="tool-calc" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left: Input & Customization -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+            <h3 class="text-sm font-bold text-slate-900 border-b pb-3 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center justify-center">1</span>
+              Select Vehicle Model
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">1. Select Brand</label>
+                <select id="user-brand-select" onchange="onUserBrandSelect()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white"></select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">2. Select Bike Model</label>
+                <select id="user-model-select" onchange="onUserModelSelect()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white"></select>
+              </div>
+            </div>
+
+            <!-- Auto-populated card -->
+            <div id="user-bike-specs-card" class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-2"></div>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-5">
+            <h3 class="text-sm font-bold text-slate-900 border-b pb-3 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center justify-center">2</span>
+              Customer Customization
+            </h3>
+            
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs font-semibold">
+                <span>Down Payment Amount</span>
+                <span id="user-downpayment-val" class="text-indigo-600 font-bold"></span>
+              </div>
+              <input type="range" id="user-down-slider" oninput="onUserDownSlider(this.value)" class="w-full h-2 bg-slate-200 rounded-lg accent-indigo-600 cursor-pointer">
+              <div class="flex gap-2 pt-1">
+                <input type="number" id="user-down-input" oninput="onUserDownInput(this.value)" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl font-semibold">
+                <button onclick="resetToMinDown()" class="px-3 py-2 text-xs bg-slate-100 rounded-xl hover:bg-slate-200 text-slate-700 font-medium shrink-0">Reset Min</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Facility Period (Months)</label>
+              <div class="grid grid-cols-5 gap-2" id="user-period-buttons">
+                <button onclick="setPeriod(12)" class="period-btn py-2 text-xs font-bold rounded-xl border" data-period="12">12M</button>
+                <button onclick="setPeriod(24)" class="period-btn py-2 text-xs font-bold rounded-xl border" data-period="24">24M</button>
+                <button onclick="setPeriod(36)" class="period-btn py-2 text-xs font-bold rounded-xl border" data-period="36">36M</button>
+                <button onclick="setPeriod(48)" class="period-btn py-2 text-xs font-bold rounded-xl border" data-period="48">48M</button>
+                <button onclick="setPeriod(60)" class="period-btn py-2 text-xs font-bold rounded-xl border" data-period="60">60M</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Interest Rate (% p.a.)</label>
+                <input type="number" step="0.1" id="user-interest-input" oninput="onUserInterestChange(this.value)" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl font-semibold">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Facility Release Date</label>
+                <input type="date" id="user-date-input" onchange="onUserDateChange(this.value)" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Results Hero Card -->
+        <div class="lg:col-span-5 space-y-6">
+          <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-6 rounded-3xl shadow-xl border border-slate-800">
+            <span class="text-xs text-indigo-300 font-semibold uppercase tracking-wider block">Calculated Monthly Installment</span>
+            <div class="text-3xl sm:text-4xl font-extrabold text-white my-3" id="out-monthly-emi">Rs. 0.00</div>
+            <div class="grid grid-cols-2 gap-3 pt-4 border-t border-slate-800 text-xs">
+              <div><span class="text-slate-400 block">Facility Loan</span><span id="out-facility-amt" class="font-bold text-sm"></span></div>
+              <div><span class="text-slate-400 block">Total Interest</span><span id="out-total-interest" class="font-bold text-amber-400 text-sm"></span></div>
+              <div><span class="text-slate-400 block">Total Repayment</span><span id="out-total-payable" class="font-bold text-sm"></span></div>
+              <div><span class="text-slate-400 block">Total Outlay</span><span id="out-total-outlay" class="font-bold text-emerald-400 text-sm"></span></div>
+            </div>
+            <div class="pt-5 mt-4 border-t border-slate-800 flex gap-2">
+              <button onclick="switchUserTool('sched')" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 font-bold rounded-xl text-xs shadow-md">View Schedule (Tool 2)</button>
+              <button onclick="downloadQuotationPDF()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 font-semibold rounded-xl text-xs">PDF</button>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+            <h4 class="text-xs font-bold uppercase text-slate-700">Repayment Composition</h4>
+            <div class="h-3 bg-slate-100 rounded-full overflow-hidden flex" id="composition-bar"></div>
+            <div class="flex justify-between text-xs text-slate-600 pt-1" id="composition-labels"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOL 02: PAYMENT SCHEDULE -->
+      <div id="tool-sched" class="hidden space-y-6">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex justify-between items-center">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Amortization Repayment Schedule</h3>
+            <p class="text-xs text-slate-500">Detailed month-by-month principal and interest breakdown</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="window.print()" class="px-3.5 py-2 text-xs font-semibold bg-slate-100 rounded-xl border">Print</button>
+            <button onclick="downloadQuotationPDF()" class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 rounded-xl">Export PDF</button>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+          <div class="overflow-x-auto max-h-[550px]">
+            <table class="w-full text-xs text-left" id="schedule-table">
+              <thead class="bg-slate-900 text-white font-semibold sticky top-0">
+                <tr>
+                  <th class="px-4 py-3 text-center">Month #</th>
+                  <th class="px-4 py-3">Due Date</th>
+                  <th class="px-4 py-3 text-right">Beginning Balance</th>
+                  <th class="px-4 py-3 text-right text-indigo-300">Principal</th>
+                  <th class="px-4 py-3 text-right text-amber-300">Interest</th>
+                  <th class="px-4 py-3 text-right text-emerald-300">Installment</th>
+                  <th class="px-4 py-3 text-right">Ending Balance</th>
+                </tr>
+              </thead>
+              <tbody id="schedule-table-body" class="divide-y divide-slate-100 font-mono"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOL 03: RMV CALCULATOR -->
+      <div id="tool-rmv" class="hidden space-y-6">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex justify-between items-center">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">RMV Statutory Charge Breakdown</h3>
+            <p class="text-xs text-slate-500">Department of Motor Traffic mandatory registration levies</p>
+          </div>
+          <button onclick="applyRmvTierToCalc()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs">Apply to Current Loan</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3" id="rmv-tiers-container"></div>
+      </div>
+    </div>
+
+    <!-- ADMIN PANEL CONTAINER -->
+    <div id="view-admin" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex justify-between items-center">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Admin Management Table</h2>
+          <p class="text-xs text-slate-500">Manage vehicle models, pricing, discounts, and loan facilities</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="exportAdminCsv()" class="px-3.5 py-2 bg-slate-100 font-semibold text-xs rounded-xl border">Export CSV</button>
+          <button onclick="logoutAdmin()" class="px-3 py-2 bg-red-50 text-red-600 font-semibold text-xs rounded-xl border border-red-200">Logout</button>
+        </div>
+      </div>
+
+      <!-- Admin Excel Table -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-slate-900 text-white font-semibold text-[10px] uppercase">
+              <tr>
+                <th class="px-3 py-2">Brand</th>
+                <th class="px-3 py-2">Model</th>
+                <th class="px-2 py-2 text-center">Year</th>
+                <th class="px-2 py-2 text-right">CC</th>
+                <th class="px-3 py-2 text-right">Selling Price</th>
+                <th class="px-2 py-2 text-right">Discount</th>
+                <th class="px-3 py-2 text-right">Downpayment</th>
+                <th class="px-3 py-2 text-right">Doc Chg</th>
+                <th class="px-3 py-2 text-right">RMV Chg</th>
+                <th class="px-3 py-2 text-right">Facility Amt</th>
+                <th class="px-2 py-2 text-center">Period</th>
+                <th class="px-2 py-2 text-right">Rate %</th>
+              </tr>
+            </thead>
+            <tbody id="admin-table-body" class="divide-y divide-slate-100 font-mono text-[11px]"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN LOGIN MODAL -->
+  <div id="admin-login-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border p-6 space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="p-3 bg-indigo-600 rounded-xl text-white"><i data-lucide="lock" class="w-6 h-6"></i></div>
+        <div>
+          <h3 class="font-bold text-slate-900">Admin Authentication</h3>
+          <p class="text-xs text-slate-500">Default password: admin</p>
+        </div>
+      </div>
+      <input type="password" id="admin-pass-input" placeholder="Password" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border rounded-xl">
+      <p id="admin-login-error" class="text-xs text-red-600 hidden">Incorrect password (default is admin)</p>
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeAdminLoginModal()" class="flex-1 py-2 text-xs font-semibold bg-slate-100 rounded-xl">Cancel</button>
+        <button onclick="submitAdminLogin()" class="flex-1 py-2 text-xs font-bold text-white bg-indigo-600 rounded-xl">Unlock Admin</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let bikes = [
+      { id: '1', brand: 'Yamaha', model: 'FZ-S V3 ABS FI', year: 2024, engineCc: 149, sellingPrice: 125000, discount: 5000, afterDiscount: 120000, downpayment: 30000, afterDownpayment: 90000, documentChargePercent: 5, documentCharge: 6000, insuranceCharge: 4800, rmvCharge: 14000, totalCharges: 24800, facilityAmount: 114800, facilityPeriod: 36, facilityInterestRate: 14.5 },
+      { id: '2', brand: 'Yamaha', model: 'MT-15 V2 Deluxe', year: 2024, engineCc: 155, sellingPrice: 168000, discount: 4000, afterDiscount: 164000, downpayment: 40000, afterDownpayment: 124000, documentChargePercent: 5, documentCharge: 8200, insuranceCharge: 5600, rmvCharge: 14000, totalCharges: 27800, facilityAmount: 151800, facilityPeriod: 36, facilityInterestRate: 14.5 },
+      { id: '3', brand: 'Honda', model: 'CB Shine 125 Drum', year: 2024, engineCc: 124, sellingPrice: 79800, discount: 3000, afterDiscount: 76800, downpayment: 18000, afterDownpayment: 58800, documentChargePercent: 5, documentCharge: 3840, insuranceCharge: 3200, rmvCharge: 10500, totalCharges: 17540, facilityAmount: 76340, facilityPeriod: 24, facilityInterestRate: 14.0 },
+      { id: '4', brand: 'Honda', model: 'Hornet 2.0 Repsol Edition', year: 2024, engineCc: 184, sellingPrice: 139000, discount: 6000, afterDiscount: 133000, downpayment: 35000, afterDownpayment: 98000, documentChargePercent: 5, documentCharge: 6650, insuranceCharge: 5100, rmvCharge: 14000, totalCharges: 25750, facilityAmount: 123750, facilityPeriod: 36, facilityInterestRate: 14.5 },
+      { id: '5', brand: 'Bajaj', model: 'Pulsar NS200 Dual ABS', year: 2024, engineCc: 199, sellingPrice: 149000, discount: 5500, afterDiscount: 143500, downpayment: 35000, afterDownpayment: 108500, documentChargePercent: 5, documentCharge: 7175, insuranceCharge: 5400, rmvCharge: 14000, totalCharges: 26575, facilityAmount: 135075, facilityPeriod: 36, facilityInterestRate: 14.5 },
+      { id: '6', brand: 'Suzuki', model: 'Gixxer SF 250', year: 2024, engineCc: 249, sellingPrice: 192000, discount: 7000, afterDiscount: 185000, downpayment: 45000, afterDownpayment: 140000, documentChargePercent: 5, documentCharge: 9250, insuranceCharge: 6500, rmvCharge: 19500, totalCharges: 35250, facilityAmount: 175250, facilityPeriod: 48, facilityInterestRate: 14.0 },
+      { id: '7', brand: 'Royal Enfield', model: 'Classic 350 Stealth', year: 2024, engineCc: 349, sellingPrice: 221000, discount: 5000, afterDiscount: 216000, downpayment: 55000, afterDownpayment: 161000, documentChargePercent: 5, documentCharge: 10800, insuranceCharge: 7900, rmvCharge: 19500, totalCharges: 38200, facilityAmount: 199200, facilityPeriod: 48, facilityInterestRate: 14.0 }
+    ];
+
+    let rmvTiers = [
+      { id: '1', ccRange: 'Up to 125 CC', minCc: 0, maxCc: 125, totalRmv: 10500 },
+      { id: '2', ccRange: '126 CC - 200 CC', minCc: 126, maxCc: 200, totalRmv: 14000 },
+      { id: '3', ccRange: '201 CC - 350 CC', minCc: 201, maxCc: 350, totalRmv: 19500 },
+      { id: '4', ccRange: 'Above 350 CC', minCc: 351, maxCc: 1500, totalRmv: 27500 }
+    ];
+
+    let isAdminAuth = false;
+    let selectedBike = bikes[0];
+    let customDown = selectedBike.downpayment;
+    let currentPeriod = selectedBike.facilityPeriod || 36;
+    let currentRate = selectedBike.facilityInterestRate || 14.5;
+    let releaseDate = new Date().toISOString().split('T')[0];
+    let customRmv = null;
+
+    function fmt(num) {
+      return 'Rs. ' + (num || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initUserBrandSelect();
+      renderRmvTool();
+    });
+
+    function switchMode(mode) {
+      if (mode === 'admin' && !isAdminAuth) {
+        document.getElementById('admin-login-modal').classList.remove('hidden');
+        return;
+      }
+      document.getElementById('view-user').classList.toggle('hidden', mode !== 'user');
+      document.getElementById('view-admin').classList.toggle('hidden', mode !== 'admin');
+      document.getElementById('btn-mode-user').className = mode === 'user' ? 'flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-indigo-700 shadow-sm' : 'flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900';
+      document.getElementById('btn-mode-admin').className = mode === 'admin' ? 'flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 text-white shadow-sm' : 'flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900';
+      if (mode === 'admin') renderAdminTable();
+      lucide.createIcons();
+    }
+
+    function closeAdminLoginModal() {
+      document.getElementById('admin-login-modal').classList.add('hidden');
+    }
+
+    function submitAdminLogin() {
+      if (document.getElementById('admin-pass-input').value === 'admin') {
+        isAdminAuth = true;
+        closeAdminLoginModal();
+        switchMode('admin');
+      } else {
+        document.getElementById('admin-login-error').classList.remove('hidden');
+      }
+    }
+
+    function logoutAdmin() {
+      isAdminAuth = false;
+      switchMode('user');
+    }
+
+    function switchUserTool(tool) {
+      document.getElementById('tool-calc').classList.toggle('hidden', tool !== 'calc');
+      document.getElementById('tool-sched').classList.toggle('hidden', tool !== 'sched');
+      document.getElementById('tool-rmv').classList.toggle('hidden', tool !== 'rmv');
+
+      ['calc', 'sched', 'rmv'].forEach(t => {
+        const btn = document.getElementById('btn-tool-' + (t === 'calc' ? '1' : t === 'sched' ? '2' : '3'));
+        btn.className = t === tool ? 'flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-md' : 'flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100';
+      });
+
+      if (tool === 'sched') renderAmortizationTable();
+      lucide.createIcons();
+    }
+
+    function initUserBrandSelect() {
+      const brands = [...new Set(bikes.map(b => b.brand))].sort();
+      document.getElementById('user-brand-select').innerHTML = brands.map(b => '<option value="' + b + '">' + b + '</option>').join('');
+      onUserBrandSelect();
+    }
+
+    function onUserBrandSelect() {
+      const brand = document.getElementById('user-brand-select').value;
+      const brandBikes = bikes.filter(b => b.brand === brand);
+      document.getElementById('user-model-select').innerHTML = brandBikes.map(b => '<option value="' + b.id + '">' + b.model + ' (' + b.year + ')</option>').join('');
+      onUserModelSelect();
+    }
+
+    function onUserModelSelect() {
+      const id = document.getElementById('user-model-select').value;
+      selectedBike = bikes.find(b => b.id === id) || bikes[0];
+      customDown = selectedBike.downpayment;
+      currentPeriod = selectedBike.facilityPeriod || 36;
+      currentRate = selectedBike.facilityInterestRate || 14.5;
+      customRmv = null;
+
+      document.getElementById('user-down-slider').max = selectedBike.afterDiscount;
+      document.getElementById('user-down-slider').value = customDown;
+      document.getElementById('user-down-input').value = customDown;
+      document.getElementById('user-interest-input').value = currentRate;
+      document.getElementById('user-date-input').value = releaseDate;
+      setPeriod(currentPeriod);
+      updateBikeSpecsCard();
+      updateCalculatorOutput();
+    }
+
+    function resetToMinDown() {
+      customDown = selectedBike.downpayment;
+      document.getElementById('user-down-slider').value = customDown;
+      document.getElementById('user-down-input').value = customDown;
+      updateCalculatorOutput();
+    }
+
+    function updateBikeSpecsCard() {
+      const b = selectedBike;
+      const rmv = customRmv !== null ? customRmv : b.rmvCharge;
+      document.getElementById('user-bike-specs-card').innerHTML = 
+        '<div class="flex justify-between font-bold"><span>' + b.brand + ' ' + b.model + ' (' + b.year + ')</span><span>' + b.engineCc + ' CC</span></div>' +
+        '<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t">' +
+          '<div><span class="text-slate-500">Selling Price:</span> <strong>' + fmt(b.sellingPrice) + '</strong></div>' +
+          '<div><span class="text-slate-500">Discount:</span> <strong class="text-emerald-600">-' + fmt(b.discount) + '</strong></div>' +
+          '<div><span class="text-slate-500">After Disc:</span> <strong>' + fmt(b.afterDiscount) + '</strong></div>' +
+          '<div><span class="text-slate-500">Min Down:</span> <strong class="text-amber-700">' + fmt(b.downpayment) + '</strong></div>' +
+        '</div>';
+    }
+
+    function onUserDownSlider(val) {
+      customDown = Number(val);
+      document.getElementById('user-down-input').value = customDown;
+      updateCalculatorOutput();
+    }
+
+    function onUserDownInput(val) {
+      customDown = Number(val);
+      document.getElementById('user-down-slider').value = customDown;
+      updateCalculatorOutput();
+    }
+
+    function setPeriod(p) {
+      currentPeriod = p;
+      document.querySelectorAll('.period-btn').forEach(btn => {
+        const isSel = Number(btn.getAttribute('data-period')) === p;
+        btn.className = isSel ? 'period-btn py-2 text-xs font-bold rounded-xl border bg-indigo-600 border-indigo-600 text-white' : 'period-btn py-2 text-xs font-bold rounded-xl border bg-slate-50 border-slate-200 text-slate-700';
+      });
+      updateCalculatorOutput();
+    }
+
+    function onUserInterestChange(val) {
+      currentRate = Number(val);
+      updateCalculatorOutput();
+    }
+
+    function onUserDateChange(val) {
+      releaseDate = val;
+    }
+
+    function calculateLoan() {
+      const b = selectedBike;
+      const afterDown = Math.max(0, b.afterDiscount - customDown);
+      const docCharge = Math.round(b.afterDiscount * 0.05);
+      const rmvCharge = customRmv !== null ? customRmv : b.rmvCharge;
+      const totalCharges = docCharge + b.insuranceCharge + rmvCharge;
+      const facilityAmount = afterDown + totalCharges;
+
+      const r = currentRate / 100 / 12;
+      const n = currentPeriod;
+      let emi = 0;
+      if (r === 0) emi = facilityAmount / n;
+      else {
+        const factor = Math.pow(1 + r, n);
+        emi = (facilityAmount * r * factor) / (factor - 1);
+      }
+      const totalPayable = emi * n;
+      const totalInterest = totalPayable - facilityAmount;
+      const totalOutlay = customDown + totalPayable;
+
+      return { facilityAmount, emi, totalInterest, totalPayable, totalOutlay };
+    }
+
+    function updateCalculatorOutput() {
+      const res = calculateLoan();
+      document.getElementById('user-downpayment-val').textContent = fmt(customDown);
+      document.getElementById('out-monthly-emi').textContent = fmt(res.emi) + ' / mo';
+      document.getElementById('out-facility-amt').textContent = fmt(res.facilityAmount);
+      document.getElementById('out-total-interest').textContent = fmt(res.totalInterest);
+      document.getElementById('out-total-payable').textContent = fmt(res.totalPayable);
+      document.getElementById('out-total-outlay').textContent = fmt(res.totalOutlay);
+
+      const pPct = Math.round((res.facilityAmount / res.totalPayable) * 100);
+      const iPct = 100 - pPct;
+      document.getElementById('composition-bar').innerHTML = 
+        '<div style="width:' + pPct + '%" class="bg-indigo-600 h-full"></div>' +
+        '<div style="width:' + iPct + '%" class="bg-amber-500 h-full"></div>';
+      document.getElementById('composition-labels').innerHTML = 
+        '<span>Principal: ' + pPct + '%</span><span>Interest: ' + iPct + '%</span>';
+    }
+
+    function renderAmortizationTable() {
+      const res = calculateLoan();
+      const tbody = document.getElementById('schedule-table-body');
+      tbody.innerHTML = '';
+      let balance = res.facilityAmount;
+      const r = currentRate / 100 / 12;
+      const start = new Date(releaseDate);
+
+      for (let m = 1; m <= currentPeriod; m++) {
+        const d = new Date(start);
+        d.setMonth(d.getMonth() + m);
+        const dateStr = d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+        const interest = balance * r;
+        let principal = res.emi - interest;
+        let endBal = balance - principal;
+        if (m === currentPeriod || principal > balance) {
+          principal = balance;
+          endBal = 0;
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-indigo-50/30';
+        tr.innerHTML = 
+          '<td class="px-4 py-2 text-center font-sans font-bold text-slate-700 bg-slate-50/50">#' + m + '</td>' +
+          '<td class="px-4 py-2 font-sans">' + dateStr + '</td>' +
+          '<td class="px-4 py-2 text-right">' + fmt(balance) + '</td>' +
+          '<td class="px-4 py-2 text-right font-semibold text-indigo-700">' + fmt(principal) + '</td>' +
+          '<td class="px-4 py-2 text-right text-amber-700">' + fmt(interest) + '</td>' +
+          '<td class="px-4 py-2 text-right font-extrabold text-slate-900 bg-indigo-50/20">' + fmt(res.emi) + '</td>' +
+          '<td class="px-4 py-2 text-right">' + fmt(endBal) + '</td>';
+        tbody.appendChild(tr);
+        balance = endBal;
+      }
+    }
+
+    function renderRmvTool() {
+      document.getElementById('rmv-tiers-container').innerHTML = rmvTiers.map(t => 
+        '<div class="p-4 bg-slate-50 border rounded-xl">' +
+          '<div class="text-xs font-bold text-slate-900">' + t.ccRange + '</div>' +
+          '<div class="text-base font-extrabold text-amber-700 my-1">' + fmt(t.totalRmv) + '</div>' +
+        '</div>'
+      ).join('');
+    }
+
+    function applyRmvTierToCalc() {
+      customRmv = 14000;
+      updateCalculatorOutput();
+      switchUserTool('calc');
+    }
+
+    function renderAdminTable() {
+      const tbody = document.getElementById('admin-table-body');
+      tbody.innerHTML = bikes.map(b => 
+        '<tr class="hover:bg-indigo-50/40">' +
+          '<td class="px-3 py-2 font-bold font-sans">' + b.brand + '</td>' +
+          '<td class="px-3 py-2 font-sans">' + b.model + '</td>' +
+          '<td class="px-2 py-2 text-center">' + b.year + '</td>' +
+          '<td class="px-2 py-2 text-right">' + b.engineCc + '</td>' +
+          '<td class="px-3 py-2 text-right font-semibold">' + fmt(b.sellingPrice) + '</td>' +
+          '<td class="px-2 py-2 text-right text-emerald-600">' + (b.discount > 0 ? '-' + fmt(b.discount) : '—') + '</td>' +
+          '<td class="px-3 py-2 text-right text-amber-700">' + fmt(b.downpayment) + '</td>' +
+          '<td class="px-3 py-2 text-right">' + fmt(b.documentCharge) + '</td>' +
+          '<td class="px-3 py-2 text-right">' + fmt(b.rmvCharge) + '</td>' +
+          '<td class="px-3 py-2 text-right font-extrabold text-indigo-700">' + fmt(b.facilityAmount) + '</td>' +
+          '<td class="px-2 py-2 text-center font-sans">' + b.facilityPeriod + 'M</td>' +
+          '<td class="px-2 py-2 text-right">' + b.facilityInterestRate + '%</td>' +
+        '</tr>'
+      ).join('');
+    }
+
+    function exportAdminCsv() {
+      const headers = ['Brand,Model,Year,Engine CC,Selling Price,Discount,Downpayment,Facility Amount'];
+      const rows = bikes.map(b => [b.brand, b.model, b.year, b.engineCc, b.sellingPrice, b.discount, b.downpayment, b.facilityAmount].join(','));
+      const blob = new Blob([headers.concat(rows).join('\\n')], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'bikes.csv';
+      a.click();
+    }
+
+    function downloadQuotationPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(16);
+      doc.text('Vehicle Financing Quotation', 14, 20);
+      doc.setFontSize(10);
+      doc.text('Vehicle: ' + selectedBike.brand + ' ' + selectedBike.model, 14, 30);
+      doc.text('Down Payment: ' + fmt(customDown), 14, 36);
+      doc.text('Monthly Installment: ' + document.getElementById('out-monthly-emi').textContent, 14, 42);
+      doc.save('Vehicle_Financing_Quotation.pdf');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 180" role="img" aria-labelledby="title desc">
+  <title id="title">Monik Group of Companies</title>
+  <desc id="desc">Monik Group of Companies logo</desc>
+  <rect width="640" height="180" fill="#ffffff"/>
+  <g transform="translate(24 24)">
+    <path d="M0 0h55l60 78-31 40L0 42z" fill="#e32636"/>
+    <path d="M0 42l31 40-31 36zM115 0h48l-47 59-30-38z" fill="#1b365d"/>
+    <path d="M0 140h140v14H0z" fill="#1b365d"/>
+  </g>
+  <text x="186" y="91" fill="#1b365d" font-family="Arial, Helvetica, sans-serif" font-size="78" font-weight="800" letter-spacing="5">MONIK</text>
+  <text x="187" y="139" fill="#1b365d" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" letter-spacing="2.5">GROUP OF COMPANIES</text>
+</svg>
