@@ -68,7 +68,6 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
   const [period, setPeriod] = useState<number>(settings.defaultFacilityPeriod || 36);
   const [interestRate, setInterestRate] = useState<number>(settings.defaultInterestRate || 14.5);
   const [facilityDate, setFacilityDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  const [showCalculation, setShowCalculation] = useState(false);
   const [copiedNotification, setCopiedNotification] = useState<string | null>(null);
   const skipInitialBikeLoad = useRef(false);
 
@@ -86,7 +85,6 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
     setPeriod(0);
     setInterestRate(0);
     setFacilityDate(new Date().toISOString().split('T')[0]);
-    setShowCalculation(false);
     setCopiedNotification(null);
   }, [reloadToken]);
 
@@ -438,6 +436,16 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
                 </div>
               </div>
 
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">Facility Amount</label>
+                <input
+                  type="text"
+                  readOnly
+                  value={`LKR ${formatNumber(facilityAmount)}`}
+                  className="w-full border border-slate-200 rounded-lg p-2 bg-slate-100 text-xs font-bold text-slate-800 outline-none"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 mb-1">{t.period}</label>
@@ -496,7 +504,7 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
               <div className="pt-2 flex flex-col sm:flex-row gap-2">
                 <button
                   type="button"
-                  onClick={() => setShowCalculation(true)}
+                  onClick={() => onSelectTool('schedule')}
                   className="flex-1 bg-[#1B365D] hover:bg-[#122440] text-white py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 shadow transition cursor-pointer"
                 >
                   <Calculator className="w-4 h-4" />
@@ -514,8 +522,13 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
             </div>
           </div>
 
+        </>
+      )}
+
+      {(activeTool === 'calculator' || activeTool === 'schedule') && (
+        <>
           {/* 2. FORMULA SUMMARY DISPLAY (14px font target with 0.00 price format) */}
-          {showCalculation && <div
+          <div
             id="summary-card"
             ref={summaryCardRef}
             className="bg-[#1B365D] text-white p-6 rounded-xl shadow-md space-y-4"
@@ -547,6 +560,9 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
               </div>
               <div>
                 <b>Period & Rate:</b> {validPeriod} Months @ {annualRate.toFixed(2)}%
+              </div>
+              <div>
+                <b>Expected Facility Date:</b> {facilityDate || '---'}
               </div>
             </div>
 
@@ -584,12 +600,12 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
                 </span>
               </div>
             </div>
-          </div>}
+          </div>
         </>
       )}
 
       {/* 2. AMORTIZATION SCHEDULE TOOL (0.00 Format) */}
-      {(activeTool === 'schedule' || (activeTool === 'calculator' && showCalculation)) && (
+      {activeTool === 'schedule' && (
         <div className="space-y-5">
           <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-wrap justify-between items-center gap-3">
             <div>
@@ -597,7 +613,7 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
                 {currentBike ? `${currentBike.brand} ${currentBike.model}` : 'Vehicle'} — {t.scheduleTab}
               </h3>
               <p className="text-xs text-slate-500">
-                Facility: LKR {formatNumber(facilityAmount)} • Period: {validPeriod} Months • Rate: {annualRate.toFixed(2)}% p.a.
+                Facility: LKR {formatNumber(facilityAmount)} • Period: {validPeriod} Months • Rate: {annualRate.toFixed(2)}% p.a. • Start: {facilityDate || '---'}
               </p>
             </div>
             <div className="flex gap-2">
