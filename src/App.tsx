@@ -212,6 +212,7 @@ export default function App() {
             language={language}
             activeTool={activeUserTool}
             onSelectTool={setActiveUserTool}
+            onCleanReset={handleReload}
             reloadToken={calculatorReloadToken}
           />
         ) : (

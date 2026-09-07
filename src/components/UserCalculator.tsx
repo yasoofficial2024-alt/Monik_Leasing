@@ -7,6 +7,7 @@ import {
   Calendar,
   Printer,
   Download,
+  RotateCcw,
 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { BikeModel, AppSettings, CalculationInputs, CalculationResult } from '../types';
@@ -24,6 +25,7 @@ interface UserCalculatorProps {
   language: Language;
   activeTool: 'calculator' | 'schedule';
   onSelectTool: (tool: 'calculator' | 'schedule') => void;
+  onCleanReset: () => void;
   reloadToken: number;
 }
 
@@ -33,6 +35,7 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
   language,
   activeTool,
   onSelectTool,
+  onCleanReset,
   reloadToken,
 }) => {
   const t = translations[language];
@@ -519,6 +522,14 @@ export const UserCalculator: React.FC<UserCalculatorProps> = ({
                   <span>{t.btnWhatsapp}</span>
                 </button>
               </div>
+              <button
+                type="button"
+                onClick={onCleanReset}
+                className="w-full border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer"
+              >
+                <RotateCcw className="w-4 h-4" />
+                <span>Clean / Reset</span>
+              </button>
             </div>
           </div>
 
