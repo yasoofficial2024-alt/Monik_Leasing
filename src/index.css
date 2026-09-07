@@ -52,6 +52,33 @@
     color: #ffffff;
   }
 
+  .nav-action-red {
+    background: #e32636;
+    color: #ffffff;
+  }
+
+  .nav-action-red:hover {
+    background: #c81e2b;
+    color: #ffffff;
+  }
+
+  .nav-action-white {
+    background: #ffffff;
+    color: #1b365d;
+  }
+
+  .nav-action-white:hover {
+    background: #e2e8f0;
+    color: #1b365d;
+  }
+
+  .date-time-box {
+    border: 1px solid #ffffff;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    line-height: 1.35;
+  }
+
   .nav-admin {
     border-radius: 0.5rem;
     background: #1b365d;

@@ -57,19 +57,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <p className="text-sm sm:text-base text-slate-200 font-black tracking-wider uppercase mt-1">LEASING &amp; HIRE PURCHASE</p>
               </div>
             </div>
-            <div className="text-left lg:text-right text-xs sm:text-sm font-bold text-white whitespace-nowrap">
+            <div className="date-time-box text-left lg:text-right text-xs sm:text-sm font-bold text-white whitespace-nowrap">
               <div>{currentDateTime.toLocaleDateString('en-GB')}</div>
               <div>{currentDateTime.toLocaleTimeString('en-GB')}</div>
             </div>
           </div>
 
           <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-600 pt-3">
-            <button type="button" onClick={onHome} className="nav-action"><Home className="w-4 h-4" /> Home</button>
-            <button type="button" onClick={onReload} className="nav-action"><RotateCcw className="w-4 h-4" /> Reload</button>
+            <button type="button" onClick={onHome} className="nav-action nav-action-red"><Home className="w-4 h-4" /> Home</button>
+            <button type="button" onClick={onReload} className="nav-action nav-action-white"><RotateCcw className="w-4 h-4" /> Reload</button>
             {currentMode === 'user' && onSelectTool && (
               <>
-                <button type="button" onClick={() => onSelectTool('calculator')} className={`nav-action ${activeTool === 'calculator' ? 'nav-action-active' : ''}`}>Calculate</button>
-                <button type="button" onClick={() => onSelectTool('schedule')} className={`nav-action ${activeTool === 'schedule' ? 'nav-action-active' : ''}`}>Amortization Schedule</button>
+                <button type="button" onClick={() => onSelectTool('calculator')} className="nav-action nav-action-red">Calculate</button>
+                <button type="button" onClick={() => onSelectTool('schedule')} className="nav-action nav-action-white">Amortization Schedule</button>
               </>
             )}
             <div className="ml-auto flex flex-wrap items-center gap-2">
