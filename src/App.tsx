@@ -230,14 +230,20 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-6 text-xs text-slate-500 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <img src="/assets/monik-logo.svg" alt="Monik Group of Companies" className="h-14 w-auto object-contain" />
-            <span className="font-bold text-slate-700">{settings.companyName}</span>
+      <footer className="bg-[#dbeafe] border-t border-[#93c5fd] py-6 text-xs text-slate-600 transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-2">
+          <div className="font-black text-[#1B365D]">MONIK GROUP OF COMPANIES | DEPARTMENT OF CHAIRMAN OFFICE</div>
+          <div>© 2026 MONIK GROUP. All Rights Reserved.</div>
+          <div className="font-semibold">Version 1.0.0 <span className="mx-1">•</span> Secure Internal System</div>
+          <nav className="flex flex-wrap justify-center gap-x-3 gap-y-1 font-semibold">
+            <a href="/privacy.html" className="hover:text-[#E32636] hover:underline">Privacy Policy</a>
             <span>•</span>
-            <span>Customer Hotline: <strong>0760966597</strong></span>
-          </div>
+            <a href="/terms.html" className="hover:text-[#E32636] hover:underline">Terms</a>
+            <span>•</span>
+            <a href="/help.html" className="hover:text-[#E32636] hover:underline">Help &amp; Support</a>
+            <span>•</span>
+            <a href="/contact.html" className="hover:text-[#E32636] hover:underline">Contact</a>
+          </nav>
         </div>
       </footer>
 
